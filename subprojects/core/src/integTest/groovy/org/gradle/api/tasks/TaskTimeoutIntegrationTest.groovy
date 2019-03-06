@@ -18,7 +18,6 @@ package org.gradle.api.tasks
 
 import org.gradle.integtests.fixtures.AbstractIntegrationSpec
 import org.gradle.integtests.fixtures.timeout.IntegrationTestTimeout
-import org.gradle.test.fixtures.file.LeaksFileHandles
 import org.gradle.workers.IsolationMode
 import spock.lang.Unroll
 
@@ -147,11 +146,12 @@ class TaskTimeoutIntegrationTest extends AbstractIntegrationSpec {
         failure.assertHasCause("Timeout has been exceeded")
     }
 
-    @LeaksFileHandles // TODO https://github.com/gradle/gradle-private/issues/1532
     @IntegrationTestTimeout(60)
     @Unroll
-    def "timeout stops long running work items with #isolationMode isolation"() {
+    def "timeout stops long running work items with PROCESS isolation - #timeout"() {
         given:
+        def isolationMode = IsolationMode.PROCESS
+        timeout == timeout % 1000
         if (isolationMode == IsolationMode.PROCESS) {
             // worker starting threads can be interrupted during worker startup and cause a 'Could not initialise system classpath' exception.
             executer.withStackTraceChecksDisabled()
@@ -162,7 +162,7 @@ class TaskTimeoutIntegrationTest extends AbstractIntegrationSpec {
             import javax.inject.Inject;
             
             task block(type: WorkerTask) {
-                timeout = Duration.ofMillis($TIMEOUT)
+                timeout = Duration.ofMillis($timeout)
             }
             
             class WorkerTask extends DefaultTask {
@@ -202,6 +202,6 @@ class TaskTimeoutIntegrationTest extends AbstractIntegrationSpec {
         }
 
         where:
-        isolationMode << IsolationMode.values()
+        timeout << (10..1000)
     }
 }
