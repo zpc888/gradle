@@ -58,10 +58,37 @@ public class ExecHandleRunner implements Runnable {
             if (process != null) {
                 streamsHandler.disconnect();
                 LOGGER.debug("Abort requested. Destroying process: {}.", execHandle.getDisplayName());
-                process.destroy();
+                multiAttemptProcessDestroy();
             }
         } finally {
             lock.unlock();
+        }
+    }
+
+    private void multiAttemptProcessDestroy() {
+        for (int i = 0; i < 5; i++) {
+            process.destroy();
+            sleepWithoutInterruption(10);
+            try {
+                process.exitValue();
+                return; //successfully obtained exit value
+            } catch (IllegalThreadStateException e) {
+                sleepWithoutInterruption(500);
+            }
+        }
+        LOGGER.info("Failed to stop process " + execHandle.getDisplayName());
+        throw new RuntimeException("Failed to stop process"); //TODO for experiment
+    }
+
+    private void sleepWithoutInterruption(long millis) {
+        boolean restoreInterrupt = Thread.interrupted();
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            restoreInterrupt = false;
+        }
+        if (restoreInterrupt) {
+            Thread.currentThread().interrupt();
         }
     }
 
