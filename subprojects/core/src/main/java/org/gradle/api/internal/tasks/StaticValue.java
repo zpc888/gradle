@@ -19,6 +19,7 @@ package org.gradle.api.internal.tasks;
 import org.gradle.api.Task;
 import org.gradle.api.internal.provider.ProducerAwareProperty;
 import org.gradle.api.internal.provider.PropertyInternal;
+import org.gradle.api.internal.provider.ProviderInternal;
 import org.gradle.api.internal.tasks.properties.PropertyValue;
 import org.gradle.api.provider.Provider;
 
@@ -29,6 +30,14 @@ public class StaticValue implements PropertyValue {
 
     public StaticValue(@Nullable Object value) {
         this.value = value;
+    }
+
+    @Override
+    public TaskDependencyContainer getTaskDependencies() {
+        if (value instanceof ProviderInternal) {
+            return (ProviderInternal) value;
+        }
+        return TaskDependencyContainer.EMPTY;
     }
 
     @Override
