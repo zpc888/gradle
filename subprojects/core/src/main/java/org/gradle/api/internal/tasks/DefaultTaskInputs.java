@@ -218,7 +218,6 @@ public class DefaultTaskInputs implements TaskInputsInternal {
                 public void visitInputProperty(String propertyName, PropertyValue value, boolean optional) {
                     final Object unpacked = value.call();
                     if (unpacked instanceof ProviderInternal) {
-                        System.out.println("-> provider!!");
                         context.add(new TaskDependencyContainer() {
                             @Override
                             public void visitDependencies(TaskDependencyResolveContext context) {
