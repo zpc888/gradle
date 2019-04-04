@@ -17,7 +17,6 @@
 package org.gradle.api.internal.tasks;
 
 import org.gradle.api.Task;
-import org.gradle.api.internal.provider.ProducerAwareProperty;
 import org.gradle.api.internal.provider.PropertyInternal;
 import org.gradle.api.internal.provider.ProviderInternal;
 import org.gradle.api.internal.tasks.properties.PropertyValue;
@@ -25,11 +24,18 @@ import org.gradle.api.provider.Provider;
 
 import javax.annotation.Nullable;
 
+/**
+ * A {@link PropertyValue} backed by a fixed value.
+ */
 public class StaticValue implements PropertyValue {
     private final Object value;
 
     public StaticValue(@Nullable Object value) {
         this.value = value;
+    }
+
+    public static PropertyValue of(@Nullable Object value) {
+        return new StaticValue(value);
     }
 
     @Override
@@ -42,8 +48,8 @@ public class StaticValue implements PropertyValue {
 
     @Override
     public void attachProducer(Task producer) {
-        if (value instanceof ProducerAwareProperty) {
-            ((ProducerAwareProperty)value).attachProducer(producer);
+        if (value instanceof PropertyInternal) {
+            ((PropertyInternal)value).attachProducer(producer);
         }
     }
 

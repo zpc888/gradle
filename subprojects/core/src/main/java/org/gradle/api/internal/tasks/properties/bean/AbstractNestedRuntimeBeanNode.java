@@ -20,7 +20,6 @@ import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import org.gradle.api.GradleException;
 import org.gradle.api.Task;
-import org.gradle.api.internal.provider.ProducerAwareProperty;
 import org.gradle.api.internal.provider.PropertyInternal;
 import org.gradle.api.internal.provider.ProviderInternal;
 import org.gradle.api.internal.tasks.TaskDependencyContainer;
@@ -106,8 +105,8 @@ public abstract class AbstractNestedRuntimeBeanNode extends RuntimeBeanNode<Obje
         public void attachProducer(Task producer) {
             if (isProvider()) {
                 Object value = valueSupplier.get();
-                if (value instanceof ProducerAwareProperty) {
-                    ((ProducerAwareProperty) value).attachProducer(producer);
+                if (value instanceof PropertyInternal) {
+                    ((PropertyInternal) value).attachProducer(producer);
                 }
             }
         }
