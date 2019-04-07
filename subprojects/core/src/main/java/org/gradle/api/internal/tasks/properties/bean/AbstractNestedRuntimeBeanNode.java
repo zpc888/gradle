@@ -95,7 +95,7 @@ public abstract class AbstractNestedRuntimeBeanNode extends RuntimeBeanNode<Obje
             if (isProvider()) {
                 Object value = valueSupplier.get();
                 if (value instanceof ProviderInternal) {
-                    return ((ProviderInternal) value);
+                    return (ProviderInternal) value;
                 }
             }
             return TaskDependencyContainer.EMPTY;
